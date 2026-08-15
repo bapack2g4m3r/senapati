@@ -1,0 +1,30 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Inter:wght@100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap');
+
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #0A0A0A;
+  --color-secondary: #1A1A1A;
+  --color-accent-primary: #C81D25;
+  --color-accent-secondary: #E63946;
+  --color-neutral: #FFFFFF;
+  --color-supporting: #D9D9D9;
+  --color-hover: #B8B8B8;
+  
+  --font-heading: "Cormorant Garamond", serif;
+  --font-heading-alt: "Playfair Display", serif;
+  --font-body: "Inter", sans-serif;
+  --font-button: "Montserrat", sans-serif;
+}
+
+@layer base {
+  body {
+    background-color: var(--color-primary);
+    color: var(--color-neutral);
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    letter-spacing: 0.025em;
+  }
+}
