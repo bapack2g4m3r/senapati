@@ -366,6 +366,17 @@ export default function Admin() {
                         </td>
                         <td className="py-4 px-4 text-right">
                           <div className="flex justify-end space-x-2">
+                            {member.users?.phone_number && (
+                              <a 
+                                href={getWhatsAppLink(member.users.phone_number)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-2 bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 rounded-sm transition-colors"
+                                title={`Chat WhatsApp (${member.users.phone_number})`}
+                              >
+                                <MessageCircle className="w-5 h-5" />
+                              </a>
+                            )}
                             <button 
                               onClick={() => handleApprove(member.user_id)}
                               className="p-2 bg-green-500/10 text-green-500 hover:bg-green-500/20 rounded-sm transition-colors"

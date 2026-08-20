@@ -29,7 +29,7 @@ export default function Register() {
 
   // Form State
   const [formData, setFormData] = useState({
-    fullName: '', nickname: '', dob: '', gender: '',
+    fullName: '', nickname: '', dob: '', gender: '', phoneNumber: '',
     memberType: '', 
     yearJoined: '', generationNumber: '',
     skills: [],
@@ -75,7 +75,7 @@ export default function Register() {
 
   const nextStep = () => {
     if (currentStep === 1) {
-      if (!formData.fullName || !formData.nickname || !formData.email || !formData.password || !formData.dob || !formData.gender) {
+      if (!formData.fullName || !formData.nickname || !formData.email || !formData.password || !formData.dob || !formData.gender || !formData.phoneNumber) {
         showAlert(t('Mohon lengkapi semua data pada Informasi Pribadi terlebih dahulu.'));
         return;
       }
@@ -129,6 +129,7 @@ export default function Register() {
           full_name: formData.fullName,
           nickname: formData.nickname,
           email: formData.email,
+          phone_number: formData.phoneNumber,
           role: 'user'
         });
 
@@ -238,6 +239,9 @@ export default function Register() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Input label="Email Akun" name="email" type="email" value={formData.email} onChange={handleInputChange} />
+                    <Input label="Nomor WhatsApp" name="phoneNumber" type="tel" placeholder="Contoh: 08123456789 atau 628123456789" value={formData.phoneNumber} onChange={handleInputChange} />
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="flex flex-col space-y-2 w-full relative">
                       <label className="text-xs text-supporting font-button tracking-widest uppercase">Password Akun</label>
                       <div className="relative">
