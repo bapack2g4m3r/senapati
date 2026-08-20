@@ -18,6 +18,8 @@ import Pengurus from './pages/Pengurus';
 import SenapatiTV from './pages/SenapatiTV';
 import Donasi from './pages/Donasi';
 import DigitalWall from './pages/DigitalWall';
+import Admin from './pages/Admin';
+import Login from './pages/Login';
 
 function App() {
   return (
@@ -33,6 +35,7 @@ function App() {
           <Route path="/community" element={<Community />} />
           <Route path="/events" element={<Events />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={<Dashboard />} />
           
           {/* V2.0 Routes */}
@@ -43,6 +46,7 @@ function App() {
           <Route path="/tv" element={<SenapatiTV />} />
           <Route path="/donasi" element={<Donasi />} />
           <Route path="/digital-wall" element={<DigitalWall />} />
+          <Route path="/admin" element={<Admin />} />
         </Routes>
       </main>
     </div>

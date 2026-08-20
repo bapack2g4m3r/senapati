@@ -118,15 +118,15 @@ export default function Navbar() {
           ))}
           
           <Link
-            to="/dashboard"
+            to="/login"
             className="text-sm font-button tracking-widest transition-colors text-supporting hover:text-accent-primary"
           >
-            HUB MEMBER
+            LOGIN
           </Link>
 
           <Link
             to="/register"
-            className="flex items-center space-x-2 border border-accent-primary text-accent-primary px-4 py-2 hover:bg-accent-primary hover:text-white transition-all font-button text-sm tracking-widest rounded-sm"
+            className="flex items-center space-x-2 border border-accent-primary bg-accent-primary text-white px-4 py-2 hover:bg-accent-secondary transition-all font-button text-sm tracking-widest rounded-sm"
           >
             <User size={16} />
             <span>BERGABUNG</span>
@@ -183,11 +183,11 @@ export default function Navbar() {
 
             <div className="mt-8 pt-6 border-t border-white/10 flex flex-col space-y-4">
               <Link
-                to="/dashboard"
+                to="/login"
                 className="text-white font-button tracking-widest text-center py-3 border border-white/20"
                 onClick={() => setMobileMenuOpen(false)}
               >
-                HUB MEMBER
+                LOGIN
               </Link>
               <Link
                 to="/register"

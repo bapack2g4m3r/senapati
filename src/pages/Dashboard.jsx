@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { User, QrCode, FileText, Calendar, MessageSquare, BookOpen, LogOut } from 'lucide-react';
 import { cn } from '../lib/utils';
@@ -8,8 +9,8 @@ export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('profile');
   const [user, setUser] = useState(null);
 
-  // In a real app, we would fetch the user from Supabase Auth and then fetch their profile.
-  // For the prototype, we'll mock the logged-in state if no user is found in Supabase.
+  const navigate = useNavigate();
+
   useEffect(() => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
@@ -21,13 +22,13 @@ export default function Dashboard() {
           .eq('id', user.id)
           .single();
         
-        setUser(profile || getMockUser());
+        setUser(profile);
       } else {
-        setUser(getMockUser());
+        navigate('/login');
       }
     };
     fetchUser();
-  }, []);
+  }, [navigate]);
 
   if (!user) return <div className="min-h-screen bg-primary flex items-center justify-center text-white">Loading...</div>;
 
