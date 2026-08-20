@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
-import { ChevronRight, ChevronLeft, Check } from 'lucide-react';
+import { ChevronRight, ChevronLeft, Check, Eye, EyeOff } from 'lucide-react';
+import { useEffect } from 'react';
 
 const steps = [
   { id: 1, title: 'Informasi Pribadi' },
@@ -16,16 +17,38 @@ export default function Register() {
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [provinces, setProvinces] = useState([]);
+  const [cities, setCities] = useState([]);
 
   // Form State
   const [formData, setFormData] = useState({
     fullName: '', nickname: '', dob: '', gender: '',
     memberType: '', 
-    yearJoined: '', graduationYear: '', generationNumber: '',
+    yearJoined: '', generationNumber: '',
     skills: [],
-    profession: '', workplace: '', city: '', instagram: '', linkedin: '', biography: '',
-    email: '', password: '' // Added for actual auth
+    profession: '', workplace: '', country: 'Indonesia', provinceId: '', provinceName: '', city: '', instagram: '', linkedin: '', biography: '',
+    email: '', password: ''
   });
+
+  useEffect(() => {
+    fetch('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json')
+      .then(res => res.json())
+      .then(data => setProvinces(data))
+      .catch(err => console.error("Error fetching provinces:", err));
+  }, []);
+
+  useEffect(() => {
+    if (formData.provinceId) {
+      fetch(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${formData.provinceId}.json`)
+        .then(res => res.json())
+        .then(data => setCities(data))
+        .catch(err => console.error("Error fetching cities:", err));
+    } else {
+      setCities([]);
+    }
+  }, [formData.provinceId]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -41,11 +64,40 @@ export default function Register() {
     }));
   };
 
-  const nextStep = () => setCurrentStep(prev => Math.min(prev + 1, steps.length));
+  const nextStep = () => {
+    if (currentStep === 1) {
+      if (!formData.fullName || !formData.nickname || !formData.email || !formData.password || !formData.dob || !formData.gender) {
+        alert('Mohon lengkapi semua data pada Informasi Pribadi terlebih dahulu.');
+        return;
+      }
+    }
+    if (currentStep === 2) {
+      if (!formData.memberType) {
+        alert('Mohon pilih Status Keanggotaan.');
+        return;
+      }
+    }
+    if (currentStep === 3) {
+      if (!formData.generationNumber || !formData.yearJoined) {
+        alert('Mohon lengkapi Angkatan dan Tahun Bergabung.');
+        return;
+      }
+    }
+    
+    setCurrentStep(prev => Math.min(prev + 1, steps.length));
+  };
+  
   const prevStep = () => setCurrentStep(prev => Math.max(prev - 1, 1));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate Step 5
+    if (!formData.profession || !formData.city) {
+      alert('Mohon lengkapi Profesi dan Kota Domisili.');
+      return;
+    }
+
     setIsSubmitting(true);
     
     try {
@@ -81,7 +133,6 @@ export default function Register() {
           member_status: formData.memberType,
           generation_number: parseInt(formData.generationNumber) || null,
           join_year: parseInt(formData.yearJoined) || null,
-          graduation_year: parseInt(formData.graduationYear) || null,
           skills: formData.skills,
           profession: formData.profession,
           city: formData.city,
@@ -178,7 +229,25 @@ export default function Register() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Input label="Email Akun" name="email" type="email" value={formData.email} onChange={handleInputChange} />
-                    <Input label="Password Akun" name="password" type="password" value={formData.password} onChange={handleInputChange} />
+                    <div className="flex flex-col space-y-2 w-full relative">
+                      <label className="text-xs text-supporting font-button tracking-widest uppercase">Password Akun</label>
+                      <div className="relative">
+                        <input 
+                          type={showPassword ? "text" : "password"}
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          className="bg-primary border border-white/10 text-white px-4 py-3 font-body focus:outline-none focus:border-accent-primary transition-colors w-full pr-12"
+                        />
+                        <button 
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-supporting hover:text-white transition-colors"
+                        >
+                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Input label="Tanggal Lahir" name="dob" type="date" value={formData.dob} onChange={handleInputChange} />
@@ -201,10 +270,21 @@ export default function Register() {
 
               {currentStep === 3 && (
                 <div className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <Input label="Angkatan Ke-" name="generationNumber" type="number" value={formData.generationNumber} onChange={handleInputChange} />
-                    <Input label="Tahun Bergabung" name="yearJoined" type="number" value={formData.yearJoined} onChange={handleInputChange} />
-                    <Input label="Tahun Lulus" name="graduationYear" type="number" value={formData.graduationYear} onChange={handleInputChange} />
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Select 
+                      label="Angkatan Ke-" 
+                      name="generationNumber" 
+                      value={formData.generationNumber} 
+                      onChange={handleInputChange} 
+                      options={Array.from({ length: 25 }, (_, i) => (i + 1).toString())}
+                    />
+                    <Select 
+                      label="Tahun Bergabung" 
+                      name="yearJoined" 
+                      value={formData.yearJoined} 
+                      onChange={handleInputChange} 
+                      options={Array.from({ length: new Date().getFullYear() - 2001 }, (_, i) => (new Date().getFullYear() - i).toString())}
+                    />
                   </div>
                 </div>
               )}
@@ -232,10 +312,70 @@ export default function Register() {
               {currentStep === 5 && (
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <Input label="Profesi Saat Ini" name="profession" value={formData.profession} onChange={handleInputChange} />
+                    <Select 
+                      label="Profesi Saat Ini" 
+                      name="profession" 
+                      value={formData.profession} 
+                      onChange={handleInputChange} 
+                      options={['Pelajar/Mahasiswa', 'Pegawai Negeri Sipil (PNS)', 'TNI/POLRI', 'Karyawan Swasta', 'Karyawan BUMN/BUMD', 'Wiraswasta/Pengusaha', 'Pekerja Lepas (Freelance)', 'Pensiunan', 'Mengurus Rumah Tangga', 'Belum/Tidak Bekerja', 'Lainnya']}
+                    />
                     <Input label="Institusi / Tempat Kerja" name="workplace" value={formData.workplace} onChange={handleInputChange} />
                   </div>
-                  <Input label="Kota Domisili" name="city" value={formData.city} onChange={handleInputChange} />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <Select 
+                      label="Negara" 
+                      name="country" 
+                      value={formData.country} 
+                      onChange={handleInputChange} 
+                      options={['Indonesia', 'Luar Negeri']}
+                    />
+                    {formData.country === 'Indonesia' ? (
+                      <div className="flex flex-col space-y-2 w-full">
+                        <label className="text-xs text-supporting font-button tracking-widest uppercase">Provinsi</label>
+                        <select 
+                          className="bg-primary border border-white/10 text-white px-4 py-3 font-body focus:outline-none focus:border-accent-primary transition-colors w-full appearance-none"
+                          name="provinceId"
+                          value={formData.provinceId}
+                          onChange={(e) => {
+                            const selectedOption = e.target.options[e.target.selectedIndex];
+                            setFormData(prev => ({ 
+                              ...prev, 
+                              provinceId: e.target.value, 
+                              provinceName: selectedOption.text,
+                              city: '' // reset city when province changes
+                            }));
+                          }}
+                        >
+                          <option value="" disabled className="text-supporting/50">Pilih Provinsi</option>
+                          {provinces.map(prov => (
+                            <option key={prov.id} value={prov.id}>{prov.name}</option>
+                          ))}
+                        </select>
+                      </div>
+                    ) : (
+                      <Input label="Kota & Negara Bagian" name="city" value={formData.city} onChange={handleInputChange} placeholder="Contoh: New York, USA" />
+                    )}
+                  </div>
+
+                  {formData.country === 'Indonesia' && (
+                    <div className="flex flex-col space-y-2 w-full">
+                      <label className="text-xs text-supporting font-button tracking-widest uppercase">Kota/Kabupaten Domisili</label>
+                      <select 
+                        className="bg-primary border border-white/10 text-white px-4 py-3 font-body focus:outline-none focus:border-accent-primary transition-colors w-full appearance-none"
+                        name="city"
+                        value={formData.city}
+                        onChange={handleInputChange}
+                        disabled={!formData.provinceId}
+                      >
+                        <option value="" disabled className="text-supporting/50">{formData.provinceId ? 'Pilih Kota/Kabupaten' : 'Pilih Provinsi Terlebih Dahulu'}</option>
+                        {cities.map(city => (
+                          <option key={city.id} value={city.name}>{city.name}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <Input label="Username Instagram" name="instagram" placeholder="@" value={formData.instagram} onChange={handleInputChange} />
                     <Input label="Profil LinkedIn (URL)" name="linkedin" value={formData.linkedin} onChange={handleInputChange} />
@@ -246,6 +386,7 @@ export default function Register() {
                       name="biography"
                       value={formData.biography}
                       onChange={handleInputChange}
+                      placeholder="Contoh: Saya aktif di teater sejak SMA. Pernah menyutradarai 2 pementasan lokal. Sangat tertarik dengan manajemen produksi dan penulisan naskah komedi."
                       className="bg-primary border border-white/10 text-white p-3 font-body focus:outline-none focus:border-accent-primary transition-colors min-h-[100px]"
                     />
                   </div>

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, User, ChevronDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { supabase } from '../../lib/supabase';
 
 const navGroups = [
   { name: 'BERANDA', path: '/' },
@@ -43,14 +44,29 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  const [user, setUser] = useState(null);
   const location = useLocation();
 
   useEffect(() => {
+    // Check active session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      subscription.unsubscribe();
+    };
   }, []);
 
   return (
@@ -117,20 +133,42 @@ export default function Navbar() {
             </div>
           ))}
           
-          <Link
-            to="/login"
-            className="text-sm font-button tracking-widest transition-colors text-supporting hover:text-accent-primary"
-          >
-            LOGIN
-          </Link>
+          {user ? (
+            <div className="flex items-center space-x-4">
+              <Link
+                to="/dashboard"
+                className="text-sm font-button tracking-widest transition-colors text-supporting hover:text-accent-primary"
+              >
+                DASHBOARD
+              </Link>
+              <button
+                onClick={async () => {
+                  await supabase.auth.signOut();
+                  setUser(null);
+                }}
+                className="text-sm font-button tracking-widest transition-colors text-red-400 hover:text-red-500"
+              >
+                LOGOUT
+              </button>
+            </div>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-sm font-button tracking-widest transition-colors text-supporting hover:text-accent-primary"
+              >
+                LOGIN
+              </Link>
 
-          <Link
-            to="/register"
-            className="flex items-center space-x-2 border border-accent-primary bg-accent-primary text-white px-4 py-2 hover:bg-accent-secondary transition-all font-button text-sm tracking-widest rounded-sm"
-          >
-            <User size={16} />
-            <span>BERGABUNG</span>
-          </Link>
+              <Link
+                to="/register"
+                className="flex items-center space-x-2 border border-accent-primary bg-accent-primary text-white px-4 py-2 hover:bg-accent-secondary transition-all font-button text-sm tracking-widest rounded-sm"
+              >
+                <User size={16} />
+                <span>BERGABUNG</span>
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Menu Button */}
@@ -182,21 +220,45 @@ export default function Navbar() {
             ))}
 
             <div className="mt-8 pt-6 border-t border-white/10 flex flex-col space-y-4">
-              <Link
-                to="/login"
-                className="text-white font-button tracking-widest text-center py-3 border border-white/20"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                LOGIN
-              </Link>
-              <Link
-                to="/register"
-                className="flex justify-center items-center space-x-2 bg-accent-primary text-white px-4 py-3 font-button text-sm tracking-widest rounded-sm"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <User size={16} />
-                <span>BERGABUNG SEKARANG</span>
-              </Link>
+              {user ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="text-white font-button tracking-widest text-center py-3 border border-white/20"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    DASHBOARD
+                  </Link>
+                  <button
+                    onClick={async () => {
+                      await supabase.auth.signOut();
+                      setUser(null);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="text-red-400 font-button tracking-widest text-center py-3 border border-red-500/20 bg-red-500/10"
+                  >
+                    LOGOUT
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="text-white font-button tracking-widest text-center py-3 border border-white/20"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    LOGIN
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="flex justify-center items-center space-x-2 bg-accent-primary text-white px-4 py-3 font-button text-sm tracking-widest rounded-sm"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <User size={16} />
+                    <span>BERGABUNG SEKARANG</span>
+                  </Link>
+                </>
+              )}
             </div>
           </motion.div>
         )}

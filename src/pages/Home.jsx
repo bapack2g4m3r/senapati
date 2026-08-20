@@ -36,7 +36,7 @@ export default function Home() {
           />
         ))}
         <div className="absolute inset-0 bg-gradient-to-b from-primary/80 via-primary/60 to-primary" />
-        
+
         <div className="relative z-10 container mx-auto px-6 lg:px-12 text-center flex flex-col items-center pt-20">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -48,11 +48,11 @@ export default function Home() {
               Teater Senapati
             </h1>
             <p className="text-lg md:text-xl max-w-3xl mx-auto font-body text-supporting leading-relaxed mb-10 drop-shadow-md">
-              25 years of stories. From the stage of SMA Pasundan 3 Bandung to a broader stage for art, culture, and future generations.
+              Kisah selama 25 tahun. Dari panggung SMA Pasundan 3 Bandung menuju panggung yang lebih luas bagi seni, budaya, dan generasi mendatang.
             </p>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -88,7 +88,7 @@ export default function Home() {
 
 function StatCard({ icon, number, label, delay }) {
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}

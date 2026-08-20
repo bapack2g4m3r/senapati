@@ -42,30 +42,32 @@ export default function DigitalWall() {
       </div>
 
       {/* Grid Wall */}
-      <div className="w-full h-[60vh] md:h-[80vh] bg-black overflow-y-auto overflow-x-hidden p-6 md:p-12 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 lg:gap-10 scrollbar-hide border-y border-white/10 shadow-inner">
-        {wallData.map((item, idx) => (
-          <motion.div
-            key={item.id}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ delay: (idx % 10) * 0.05 }}
-            onClick={() => setSelectedItem(item)}
-            className="group relative aspect-square cursor-pointer overflow-hidden rounded-md border border-white/20 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(200,29,37,0.4)] transition-all bg-secondary"
-          >
-            <img 
-              src={item.image} 
-              alt={item.title} 
-              className="w-full h-full object-cover filter grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
-            />
-            <div className="absolute inset-0 bg-primary/60 group-hover:bg-transparent transition-colors duration-500" />
-            
-            <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
-              <span className="text-accent-primary font-heading-alt font-bold text-2xl md:text-3xl drop-shadow-md mb-1">{item.year}</span>
-              <span className="text-white font-button text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-md">{item.title}</span>
-            </div>
-          </motion.div>
-        ))}
+      <div className="w-full h-[60vh] md:h-[80vh] bg-black overflow-y-auto overflow-x-hidden p-6 md:p-12 border-y border-white/10 shadow-inner scrollbar-hide">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6 md:gap-8 lg:gap-10 auto-rows-max">
+          {wallData.map((item, idx) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ delay: (idx % 10) * 0.05 }}
+              onClick={() => setSelectedItem(item)}
+              className="group relative aspect-square cursor-pointer overflow-hidden rounded-md border border-white/20 hover:border-accent-primary hover:shadow-[0_0_20px_rgba(200,29,37,0.4)] transition-all bg-secondary"
+            >
+              <img 
+                src={item.image} 
+                alt={item.title} 
+                className="w-full h-full object-cover filter grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-700"
+              />
+              <div className="absolute inset-0 bg-primary/60 group-hover:bg-transparent transition-colors duration-500" />
+              
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-4 text-center">
+                <span className="text-accent-primary font-heading-alt font-bold text-2xl md:text-3xl drop-shadow-md mb-1">{item.year}</span>
+                <span className="text-white font-button text-xs tracking-widest uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300 drop-shadow-md">{item.title}</span>
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       {/* Detail Modal */}

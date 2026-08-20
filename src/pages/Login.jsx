@@ -17,8 +17,11 @@ export default function Login() {
     setError(null);
 
     try {
+      // Allow username login (e.g. 'mimin') by auto-appending domain if no @ is present
+      const loginEmail = email.includes('@') ? email : `${email}@senapati.com`;
+
       const { error } = await supabase.auth.signInWithPassword({
-        email,
+        email: loginEmail,
         password,
       });
 
@@ -57,14 +60,14 @@ export default function Login() {
 
         <form onSubmit={handleLogin} className="space-y-6 relative z-10">
           <div className="flex flex-col space-y-2">
-            <label className="text-xs text-supporting font-button tracking-widest uppercase">Email</label>
+            <label className="text-xs text-supporting font-button tracking-widest uppercase">Email atau Username</label>
             <input 
-              type="email"
+              type="text"
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="bg-primary border border-white/10 text-white px-4 py-3 font-body focus:outline-none focus:border-accent-primary transition-colors w-full"
-              placeholder="Masukkan email"
+              placeholder="Masukkan email atau username"
             />
           </div>
           
