@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { User, QrCode, FileText, Calendar, MessageSquare, BookOpen, LogOut, Shield } from 'lucide-react';
+import { User, QrCode, FileText, Calendar, MessageSquare, BookOpen, LogOut, Shield, Edit2 } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
 import AlertModal from '../components/ui/AlertModal';
