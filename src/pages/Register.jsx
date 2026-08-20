@@ -213,7 +213,7 @@ export default function Register() {
                 <div className="space-y-6">
                   <p className="text-supporting text-sm mb-4">Pilih keahlian dan minat utama Anda (bisa lebih dari satu):</p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    {['Keaktoran', 'Penyutradaraan', 'Penulisan Naskah', 'Musik & Komposisi', 'Tata Panggung', 'Fotografi', 'Videografi', 'Tata Busana', 'Public Speaking'].map(skill => (
+                    {['Keaktoran', 'Penyutradaraan', 'Penulisan Naskah', 'Musik & Komposisi', 'Tata Panggung', 'Fotografi', 'Videografi', 'Tata Busana', 'Public Speaking', 'IT & Software', 'Digital Marketing', 'Desain Grafis', 'Manajemen Bisnis'].map(skill => (
                       <label key={skill} className="flex items-center space-x-3 cursor-pointer group">
                         <div className={cn(
                           "w-5 h-5 border flex items-center justify-center transition-colors",
