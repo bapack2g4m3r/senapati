@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { User, QrCode, FileText, Calendar, MessageSquare, BookOpen, LogOut, Shield } from 'lucide-react';
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
+import AlertModal from '../components/ui/AlertModal';
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState('profile');
@@ -14,6 +15,7 @@ export default function Dashboard() {
   // Edit Profile State
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({ isOpen: false, message: '', type: 'error' });
   const [formData, setFormData] = useState({
     full_name: '',
     nickname: '',
@@ -22,6 +24,10 @@ export default function Dashboard() {
     join_year: '',
     skills: []
   });
+
+  const showAlert = (message, type = 'error') => {
+    setAlertConfig({ isOpen: true, message, type });
+  };
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -121,10 +127,10 @@ export default function Dashboard() {
       }));
       
       setIsEditing(false);
-      alert('Profil berhasil diperbarui!');
+      showAlert('Profil berhasil diperbarui!', 'success');
     } catch (err) {
       console.error('Error saving profile:', err);
-      alert('Gagal menyimpan profil: ' + err.message);
+      showAlert('Gagal menyimpan profil: ' + err.message);
     } finally {
       setIsSaving(false);
     }
@@ -343,6 +349,12 @@ export default function Dashboard() {
 
         </div>
       </div>
+      <AlertModal 
+        isOpen={alertConfig.isOpen} 
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        message={alertConfig.message}
+        type={alertConfig.type}
+      />
     </div>
   );
 }

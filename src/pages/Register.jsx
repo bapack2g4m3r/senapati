@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { cn } from '../lib/utils';
+import { Link, useNavigate } from 'react-router-dom';
+import AlertModal from '../components/ui/AlertModal';
 import { ChevronRight, ChevronLeft, Check, Eye, EyeOff } from 'lucide-react';
 import { useEffect } from 'react';
 
@@ -18,6 +20,7 @@ export default function Register() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [alertConfig, setAlertConfig] = useState({ isOpen: false, message: '', type: 'error' });
 
   const [provinces, setProvinces] = useState([]);
   const [cities, setCities] = useState([]);
@@ -50,6 +53,10 @@ export default function Register() {
     }
   }, [formData.provinceId]);
 
+  const showAlert = (message, type = 'error') => {
+    setAlertConfig({ isOpen: true, message, type });
+  };
+
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -67,19 +74,19 @@ export default function Register() {
   const nextStep = () => {
     if (currentStep === 1) {
       if (!formData.fullName || !formData.nickname || !formData.email || !formData.password || !formData.dob || !formData.gender) {
-        alert('Mohon lengkapi semua data pada Informasi Pribadi terlebih dahulu.');
+        showAlert('Mohon lengkapi semua data pada Informasi Pribadi terlebih dahulu.');
         return;
       }
     }
     if (currentStep === 2) {
       if (!formData.memberType) {
-        alert('Mohon pilih Status Keanggotaan.');
+        showAlert('Mohon pilih Status Keanggotaan.');
         return;
       }
     }
     if (currentStep === 3) {
       if (!formData.generationNumber || !formData.yearJoined) {
-        alert('Mohon lengkapi Angkatan dan Tahun Bergabung.');
+        showAlert('Mohon lengkapi Angkatan dan Tahun Bergabung.');
         return;
       }
     }
@@ -94,7 +101,7 @@ export default function Register() {
     
     // Validate Step 5
     if (!formData.profession || !formData.city) {
-      alert('Mohon lengkapi Profesi dan Kota Domisili.');
+      showAlert('Mohon lengkapi Profesi dan Kota Domisili.');
       return;
     }
 
@@ -146,8 +153,8 @@ export default function Register() {
 
       setIsSuccess(true);
     } catch (error) {
-      console.error('Registration Error:', error);
-      alert(error.message || 'Terjadi kesalahan saat pendaftaran.');
+      console.error('Registration error details:', error);
+      showAlert(error.message || 'Terjadi kesalahan saat pendaftaran.');
     } finally {
       setIsSubmitting(false);
     }
@@ -429,6 +436,13 @@ export default function Register() {
           </div>
         </div>
       </div>
+
+      <AlertModal 
+        isOpen={alertConfig.isOpen} 
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        message={alertConfig.message}
+        type={alertConfig.type}
+      />
     </div>
   );
 }

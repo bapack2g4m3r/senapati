@@ -4,6 +4,7 @@ import { Check, X, ShieldAlert, Users, UserCheck, Search, Download, Edit, Trash2
 import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import AlertModal from '../components/ui/AlertModal';
 
 export default function Admin() {
   const [isAdmin, setIsAdmin] = useState(false);
@@ -20,6 +21,11 @@ export default function Admin() {
   
   // Modal State
   const [editingMember, setEditingMember] = useState(null);
+  const [alertConfig, setAlertConfig] = useState({ isOpen: false, message: '', type: 'error' });
+
+  const showAlert = (message, type = 'error') => {
+    setAlertConfig({ isOpen: true, message, type });
+  };
 
   const navigate = useNavigate();
 
@@ -93,9 +99,9 @@ export default function Admin() {
       
       setPendingMembers(prev => prev.filter(m => m.user_id !== userId));
       setAllMembers(prev => prev.map(m => m.user_id === userId ? { ...m, approved: true } : m));
-      alert('Anggota berhasil diverifikasi!');
+      showAlert('Anggota berhasil diverifikasi!', 'success');
     } catch (err) {
-      alert('Gagal memverifikasi anggota: ' + err.message);
+      showAlert('Gagal memverifikasi anggota: ' + err.message);
     }
   };
 
@@ -111,9 +117,9 @@ export default function Admin() {
 
       setPendingMembers(prev => prev.filter(m => m.user_id !== userId));
       setAllMembers(prev => prev.filter(m => m.user_id !== userId));
-      alert('Pendaftaran berhasil ditolak.');
+      showAlert('Pendaftaran berhasil ditolak.', 'success');
     } catch (err) {
-      alert('Gagal menolak anggota: ' + err.message);
+      showAlert('Gagal menolak anggota: ' + err.message);
     }
   };
 
@@ -126,9 +132,9 @@ export default function Admin() {
       if (error) throw error;
 
       setAllMembers(prev => prev.filter(m => m.user_id !== userId));
-      alert('Anggota berhasil dihapus.');
+      showAlert('Anggota berhasil dihapus.', 'success');
     } catch (err) {
-      alert('Gagal menghapus anggota: ' + err.message);
+      showAlert('Gagal menghapus anggota: ' + err.message);
     }
   };
 
@@ -139,9 +145,9 @@ export default function Admin() {
     try {
       const { error } = await supabase.auth.resetPasswordForEmail(email);
       if (error) throw error;
-      alert(`Link reset password telah dikirim ke email: ${email}`);
+      showAlert(`Link reset password telah dikirim ke email: ${email}`, 'success');
     } catch (err) {
-      alert('Gagal mengirim link reset: ' + err.message);
+      showAlert('Gagal mengirim link reset: ' + err.message);
     }
   };
 
@@ -171,9 +177,9 @@ export default function Admin() {
 
       setAllMembers(prev => prev.map(m => m.user_id === editingMember.user_id ? editingMember : m));
       setEditingMember(null);
-      alert('Data berhasil diperbarui!');
+      showAlert('Data berhasil diperbarui!', 'success');
     } catch (err) {
-      alert('Gagal memperbarui data: ' + err.message);
+      showAlert('Gagal memperbarui data: ' + err.message);
     }
   };
 
@@ -404,7 +410,7 @@ export default function Admin() {
                 <button 
                   onClick={() => {
                     navigator.clipboard.writeText(window.location.origin + '/register');
-                    alert('Link registrasi berhasil disalin! Bagikan ke calon anggota.');
+                    showAlert('Link registrasi berhasil disalin! Bagikan ke calon anggota.', 'success');
                   }}
                   className="flex-1 md:flex-none flex items-center justify-center px-4 py-2 bg-primary border border-white/10 text-white font-button text-xs tracking-widest hover:border-white transition-colors"
                 >
@@ -617,6 +623,13 @@ export default function Admin() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <AlertModal 
+        isOpen={alertConfig.isOpen} 
+        onClose={() => setAlertConfig({ ...alertConfig, isOpen: false })}
+        message={alertConfig.message}
+        type={alertConfig.type}
+      />
     </div>
   );
 }
