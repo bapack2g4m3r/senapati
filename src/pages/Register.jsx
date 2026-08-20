@@ -6,6 +6,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import AlertModal from '../components/ui/AlertModal';
 import { ChevronRight, ChevronLeft, Check, Eye, EyeOff } from 'lucide-react';
 import { useEffect } from 'react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const steps = [
   { id: 1, title: 'Informasi Pribadi' },
@@ -16,6 +17,7 @@ const steps = [
 ];
 
 export default function Register() {
+  const { t } = useLanguage();
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -74,19 +76,19 @@ export default function Register() {
   const nextStep = () => {
     if (currentStep === 1) {
       if (!formData.fullName || !formData.nickname || !formData.email || !formData.password || !formData.dob || !formData.gender) {
-        showAlert('Mohon lengkapi semua data pada Informasi Pribadi terlebih dahulu.');
+        showAlert(t('Mohon lengkapi semua data pada Informasi Pribadi terlebih dahulu.'));
         return;
       }
     }
     if (currentStep === 2) {
       if (!formData.memberType) {
-        showAlert('Mohon pilih Status Keanggotaan.');
+        showAlert(t('Mohon pilih Status Keanggotaan.'));
         return;
       }
     }
     if (currentStep === 3) {
       if (!formData.generationNumber || !formData.yearJoined) {
-        showAlert('Mohon lengkapi Angkatan dan Tahun Bergabung.');
+        showAlert(t('Mohon lengkapi Angkatan dan Tahun Bergabung.'));
         return;
       }
     }
@@ -101,7 +103,7 @@ export default function Register() {
     
     // Validate Step 5
     if (!formData.profession || !formData.city) {
-      showAlert('Mohon lengkapi Profesi dan Kota Domisili.');
+      showAlert(t('Mohon lengkapi Profesi dan Kota Domisili.'));
       return;
     }
 
@@ -154,7 +156,7 @@ export default function Register() {
       setIsSuccess(true);
     } catch (error) {
       console.error('Registration error details:', error);
-      showAlert(error.message || 'Terjadi kesalahan saat pendaftaran.');
+      showAlert(error.message || t('Terjadi kesalahan saat pendaftaran.'));
     } finally {
       setIsSubmitting(false);
     }
@@ -171,15 +173,15 @@ export default function Register() {
           <div className="w-20 h-20 bg-accent-primary rounded-full flex items-center justify-center mx-auto mb-6">
             <Check className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-3xl font-heading-alt font-bold text-white mb-4">Pendaftaran Berhasil</h2>
+          <h2 className="text-3xl font-heading-alt font-bold text-white mb-4">{t('Pendaftaran Berhasil')}</h2>
           <p className="text-supporting mb-8 font-body leading-relaxed">
-            Terima kasih telah mendaftar, {formData.nickname}. Data Anda sedang diproses oleh pengurus untuk tahap verifikasi. Silakan cek email Anda atau login ke Dashboard.
+            {t('Terima kasih telah mendaftar,')} {formData.nickname}. {t('Data Anda sedang diproses oleh pengurus untuk tahap verifikasi. Silakan cek email Anda atau login ke Dashboard.')}
           </p>
           <button 
             onClick={() => window.location.href = '/dashboard'}
             className="px-8 py-3 bg-accent-primary text-white font-button text-sm tracking-widest hover:bg-accent-secondary transition-colors uppercase w-full rounded-sm"
           >
-            Lanjut ke Dashboard
+            {t('Lanjut ke Dashboard')}
           </button>
         </motion.div>
       </div>
@@ -190,8 +192,8 @@ export default function Register() {
     <div className="pt-24 min-h-screen bg-primary px-6 lg:px-12 pb-20">
       <div className="container mx-auto max-w-3xl">
         <div className="mb-12 text-center">
-          <span className="text-accent-primary font-button tracking-widest text-sm mb-2 block">BERGABUNG</span>
-          <h1 className="text-3xl md:text-4xl font-heading-alt font-bold text-white">Registrasi Anggota</h1>
+          <span className="text-accent-primary font-button tracking-widest text-sm mb-2 block">{t('BERGABUNG')}</span>
+          <h1 className="text-3xl md:text-4xl font-heading-alt font-bold text-white">{t('Registrasi Anggota')}</h1>
         </div>
 
         {/* Progress Bar */}
@@ -217,7 +219,7 @@ export default function Register() {
         {/* Form Content */}
         <div className="bg-secondary p-8 md:p-12 border border-white/5">
           <h2 className="text-2xl font-heading font-bold text-white mb-8 border-b border-white/10 pb-4">
-            {steps[currentStep - 1].title}
+            {t(steps[currentStep - 1].title)}
           </h2>
           
           <AnimatePresence mode="wait">

@@ -5,8 +5,10 @@ import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import AlertModal from '../components/ui/AlertModal';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Admin() {
+  const { t } = useLanguage();
   const [isAdmin, setIsAdmin] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   
@@ -110,8 +112,6 @@ export default function Admin() {
     if (!confirmReject) return;
 
     try {
-      // Deleting member will cascade to users if set up, but let's delete users directly if we can.
-      // Wait, deleting users from `auth.users` requires admin API. We can only delete public.users.
       const { error } = await supabase.from('users').delete().eq('id', userId);
       if (error) throw error;
 
@@ -288,9 +288,9 @@ export default function Admin() {
     return (
       <div className="min-h-screen bg-primary flex flex-col items-center justify-center text-center pt-24 pb-20 px-6">
         <ShieldAlert className="w-16 h-16 text-accent-primary mb-4" />
-        <h1 className="text-3xl font-heading font-bold text-white mb-2">Akses Ditolak</h1>
+        <h1 className="text-3xl font-heading font-bold text-white mb-2">{t('Akses Ditolak')}</h1>
         <p className="text-supporting max-w-md">
-          Halaman ini khusus untuk pengurus (Admin). Jika Anda merasa seharusnya memiliki akses ini, silakan hubungi administrator sistem.
+          {t('Halaman ini khusus untuk pengurus (Admin). Jika Anda merasa seharusnya memiliki akses ini, silakan hubungi administrator sistem.')}
         </p>
       </div>
     );
@@ -301,8 +301,8 @@ export default function Admin() {
       <div className="container mx-auto max-w-7xl">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 border-b border-white/10 pb-6">
           <div>
-            <span className="text-accent-primary font-button tracking-widest text-sm mb-2 block">DASHBOARD PENGURUS</span>
-            <h1 className="text-3xl md:text-4xl font-heading-alt font-bold text-white">Manajemen Senapati</h1>
+            <span className="text-accent-primary font-button tracking-widest text-sm mb-2 block">{t('DASHBOARD PENGURUS')}</span>
+            <h1 className="text-3xl md:text-4xl font-heading-alt font-bold text-white">{t('Manajemen Senapati')}</h1>
           </div>
           
           <div className="flex space-x-2 mt-6 md:mt-0 bg-secondary p-1 rounded-sm border border-white/10">
@@ -314,7 +314,7 @@ export default function Admin() {
               )}
             >
               <UserCheck className="w-4 h-4 mr-2" />
-              VERIFIKASI {pendingMembers.length > 0 && <span className="ml-2 bg-white text-accent-primary px-1.5 rounded-full text-[10px]">{pendingMembers.length}</span>}
+              {t('VERIFIKASI')} {pendingMembers.length > 0 && <span className="ml-2 bg-white text-accent-primary px-1.5 rounded-full text-[10px]">{pendingMembers.length}</span>}
             </button>
             <button 
               onClick={() => setActiveTab('manage')}
@@ -324,7 +324,7 @@ export default function Admin() {
               )}
             >
               <Users className="w-4 h-4 mr-2" />
-              SEMUA ANGGOTA
+              {t('SEMUA ANGGOTA')}
             </button>
           </div>
         </div>

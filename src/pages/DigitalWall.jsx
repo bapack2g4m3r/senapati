@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Users, History, Sparkles } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { cn } from '../lib/utils';
 
 // Mock Data
@@ -15,6 +16,7 @@ const wallData = Array.from({ length: 25 }, (_, i) => ({
 }));
 
 export default function DigitalWall() {
+  const { t } = useLanguage();
   const [selectedItem, setSelectedItem] = useState(null);
 
   return (
@@ -29,7 +31,7 @@ export default function DigitalWall() {
           animate={{ opacity: 1, y: 0 }}
           className="text-4xl md:text-5xl font-heading-alt font-bold text-white mb-4"
         >
-          Senapati 25 Years Digital Wall
+          {t('Senapati 25 Years Digital Wall')}
         </motion.h1>
         <motion.p 
           initial={{ opacity: 0 }}
@@ -37,7 +39,7 @@ export default function DigitalWall() {
           transition={{ delay: 0.2 }}
           className="text-supporting font-body max-w-2xl mx-auto text-lg px-6"
         >
-          Dinding sejarah yang mengukir jejak setiap generasi. Klik pada setiap angkatan untuk membuka arsip kenangan mereka.
+          {t('Dinding sejarah yang mengukir jejak setiap generasi. Klik pada setiap angkatan untuk membuka arsip kenangan mereka.')}
         </motion.p>
       </div>
 
@@ -104,7 +106,7 @@ export default function DigitalWall() {
               <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center overflow-y-auto bg-secondary">
                 <div className="mb-2">
                   <span className="inline-block bg-accent-primary/20 text-accent-primary px-3 py-1 text-xs font-button tracking-widest uppercase rounded-sm border border-accent-primary/30">
-                    Tahun {selectedItem.year}
+                    {t('Tahun')} {selectedItem.year}
                   </span>
                 </div>
                 <h2 className="text-4xl font-heading font-bold text-white mb-6">{selectedItem.title}</h2>
@@ -117,21 +119,21 @@ export default function DigitalWall() {
                   <div>
                     <div className="flex items-center space-x-2 text-supporting mb-1">
                       <Users className="w-4 h-4" />
-                      <span className="text-xs font-button tracking-widest uppercase">Anggota Terdata</span>
+                      <span className="text-xs font-button tracking-widest uppercase">{t('Anggota Terdata')}</span>
                     </div>
-                    <p className="text-2xl font-heading font-bold text-white">{selectedItem.membersCount} Orang</p>
+                    <p className="text-2xl font-heading font-bold text-white">{selectedItem.membersCount} {t('Orang')}</p>
                   </div>
                   <div>
                     <div className="flex items-center space-x-2 text-supporting mb-1">
                       <History className="w-4 h-4" />
-                      <span className="text-xs font-button tracking-widest uppercase">Pementasan</span>
+                      <span className="text-xs font-button tracking-widest uppercase">{t('Pementasan')}</span>
                     </div>
-                    <p className="text-2xl font-heading font-bold text-white">{selectedItem.performancesCount} Karya</p>
+                    <p className="text-2xl font-heading font-bold text-white">{selectedItem.performancesCount} {t('Karya')}</p>
                   </div>
                 </div>
                 
                 <button className="w-full mt-8 bg-transparent border border-white/20 hover:bg-white hover:text-primary transition-colors text-white py-3 font-button tracking-widest text-sm uppercase rounded-sm">
-                  Lihat Arsip Lengkap
+                  {t('Lihat Arsip Lengkap')}
                 </button>
               </div>
             </motion.div>

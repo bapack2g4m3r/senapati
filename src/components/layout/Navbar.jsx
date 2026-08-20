@@ -4,6 +4,7 @@ import { Menu, X, User, ChevronDown } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '../../lib/supabase';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const navGroups = [
   { name: 'BERANDA', path: '/' },
@@ -46,6 +47,7 @@ export default function Navbar() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [user, setUser] = useState(null);
   const location = useLocation();
+  const { language, toggleLanguage, t } = useLanguage();
 
   useEffect(() => {
     // Check active session
@@ -97,11 +99,11 @@ export default function Navbar() {
                     location.pathname === group.path ? 'text-accent-primary font-medium' : 'text-supporting'
                   )}
                 >
-                  {group.name}
+                  {t(group.name)}
                 </Link>
               ) : (
                 <button className="text-sm font-button tracking-widest text-supporting hover:text-accent-primary transition-colors py-2 flex items-center gap-1">
-                  {group.name}
+                  {t(group.name)}
                   <ChevronDown className={cn("w-4 h-4 transition-transform", activeDropdown === group.name && "rotate-180")} />
                 </button>
               )}
@@ -123,7 +125,7 @@ export default function Navbar() {
                           to={item.path}
                           className="block px-4 py-2 text-sm font-button tracking-widest text-supporting hover:text-white hover:bg-white/5 transition-colors"
                         >
-                          {item.name}
+                          {t(item.name)}
                         </Link>
                       ))}
                     </motion.div>
@@ -139,7 +141,7 @@ export default function Navbar() {
                 to="/dashboard"
                 className="text-sm font-button tracking-widest transition-colors text-supporting hover:text-accent-primary"
               >
-                DASHBOARD
+                {t('Dashboard')}
               </Link>
               <button
                 onClick={async () => {
@@ -148,27 +150,35 @@ export default function Navbar() {
                 }}
                 className="text-sm font-button tracking-widest transition-colors text-red-400 hover:text-red-500"
               >
-                LOGOUT
+                {t('Logout')}
               </button>
             </div>
           ) : (
-            <>
+            <div className="flex items-center space-x-3">
               <Link
                 to="/login"
-                className="text-sm font-button tracking-widest transition-colors text-supporting hover:text-accent-primary"
+                className="px-5 py-2 text-white hover:text-accent-primary text-sm font-button tracking-widest transition-colors"
               >
-                LOGIN
+                {t('MASUK')}
               </Link>
-
               <Link
                 to="/register"
-                className="flex items-center space-x-2 border border-accent-primary bg-accent-primary text-white px-4 py-2 hover:bg-accent-secondary transition-all font-button text-sm tracking-widest rounded-sm"
+                className="px-5 py-2 bg-accent-primary hover:bg-accent-secondary text-white text-sm font-button tracking-widest transition-colors rounded-sm"
               >
-                <User size={16} />
-                <span>BERGABUNG</span>
+                {t('DAFTAR')}
               </Link>
-            </>
+            </div>
           )}
+
+          {/* Language Switch */}
+          <button 
+            onClick={toggleLanguage}
+            className="flex items-center space-x-1 px-3 py-1.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-colors text-xs font-button tracking-widest text-supporting ml-4"
+          >
+            <span className={language === 'id' ? 'text-white' : ''}>ID</span>
+            <span className="opacity-50">/</span>
+            <span className={language === 'su' ? 'text-white' : ''}>SU</span>
+          </button>
         </div>
 
         {/* Mobile Menu Button */}
@@ -197,37 +207,53 @@ export default function Navbar() {
                     className="text-white font-button tracking-widest text-lg font-bold"
                     onClick={() => setMobileMenuOpen(false)}
                   >
-                    {group.name}
+                    {t(group.name)}
                   </Link>
                 ) : (
-                  <div>
-                    <h3 className="text-accent-primary font-button tracking-widest text-lg font-bold mb-2">{group.name}</h3>
-                    <div className="flex flex-col pl-4 border-l border-white/10 space-y-3">
-                      {group.items.map(item => (
-                        <Link
-                          key={item.name}
-                          to={item.path}
-                          className="text-supporting font-button tracking-widest hover:text-white"
-                          onClick={() => setMobileMenuOpen(false)}
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
+                  <div className="flex flex-col space-y-2">
+                    <div className="text-sm font-button tracking-widest text-supporting px-4 py-2 opacity-50">
+                      {t(group.name)}
                     </div>
+                    {group.items.map(item => (
+                      <Link
+                        key={item.name}
+                        to={item.path}
+                        className={cn(
+                          'text-sm font-button tracking-widest transition-colors px-8 py-2 block',
+                          location.pathname === item.path ? 'text-accent-primary' : 'text-white hover:text-accent-primary'
+                        )}
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        {t(item.name)}
+                      </Link>
+                    ))}
                   </div>
                 )}
               </div>
             ))}
 
-            <div className="mt-8 pt-6 border-t border-white/10 flex flex-col space-y-4">
+            <div className="pt-6 border-t border-white/10 flex flex-col space-y-4">
+              <div className="flex items-center justify-between px-4">
+                <span className="text-xs font-button tracking-widest text-supporting">BAHASA / LANGUAGE</span>
+                <button 
+                  onClick={toggleLanguage}
+                  className="flex items-center space-x-1 px-3 py-1 bg-white/5 border border-white/10 rounded-full transition-colors text-xs font-button tracking-widest text-supporting"
+                >
+                  <span className={language === 'id' ? 'text-white' : ''}>ID</span>
+                  <span className="opacity-50">/</span>
+                  <span className={language === 'su' ? 'text-white' : ''}>SU</span>
+                </button>
+              </div>
+
               {user ? (
-                <>
+                <div className="flex flex-col space-y-4 px-4">
                   <Link
                     to="/dashboard"
-                    className="text-white font-button tracking-widest text-center py-3 border border-white/20"
                     onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center space-x-2 text-sm font-button tracking-widest text-white hover:text-accent-primary"
                   >
-                    DASHBOARD
+                    <User className="w-5 h-5" />
+                    <span>{t('Dashboard')}</span>
                   </Link>
                   <button
                     onClick={async () => {
@@ -235,29 +261,29 @@ export default function Navbar() {
                       setUser(null);
                       setMobileMenuOpen(false);
                     }}
-                    className="text-red-400 font-button tracking-widest text-center py-3 border border-red-500/20 bg-red-500/10"
+                    className="text-left text-sm font-button tracking-widest text-red-400 hover:text-red-500"
                   >
-                    LOGOUT
+                    {t('Logout')}
                   </button>
-                </>
+                </div>
               ) : (
-                <>
+                <div className="flex flex-col space-y-3 w-full">
                   <Link
                     to="/login"
-                    className="text-white font-button tracking-widest text-center py-3 border border-white/20"
                     onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center space-x-2 w-full border border-white/20 hover:border-white text-white py-3 rounded-sm font-button tracking-widest transition-colors text-sm"
                   >
-                    LOGIN
+                    <User className="w-5 h-5" />
+                    <span>{t('MASUK')}</span>
                   </Link>
                   <Link
                     to="/register"
-                    className="flex justify-center items-center space-x-2 bg-accent-primary text-white px-4 py-3 font-button text-sm tracking-widest rounded-sm"
                     onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-center space-x-2 w-full bg-accent-primary hover:bg-accent-secondary text-white py-3 rounded-sm font-button tracking-widest transition-colors text-sm"
                   >
-                    <User size={16} />
-                    <span>BERGABUNG SEKARANG</span>
+                    <span>{t('DAFTAR')}</span>
                   </Link>
-                </>
+                </div>
               )}
             </div>
           </motion.div>

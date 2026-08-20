@@ -5,8 +5,10 @@ import { User, QrCode, FileText, Calendar, MessageSquare, BookOpen, LogOut, Shie
 import { cn } from '../lib/utils';
 import { supabase } from '../lib/supabase';
 import AlertModal from '../components/ui/AlertModal';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Dashboard() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState('profile');
   const [user, setUser] = useState(null);
   const navigate = useNavigate();
@@ -164,19 +166,19 @@ export default function Dashboard() {
                 <img src={user.photo_url || '/images/stage_performance_1786818192677.jpg'} alt="Profile" className="w-full h-full object-cover" />
               </div>
               <h2 className="text-xl font-heading font-bold text-white">{user.full_name}</h2>
-              <span className="text-accent-primary font-button text-xs tracking-widest mt-1 mb-4">{user.members?.[0]?.member_status || 'Anggota'}</span>
+              <span className="text-accent-primary font-button text-xs tracking-widest mt-1 mb-4">{t(user.members?.[0]?.member_status || 'Anggota')}</span>
               <div className="w-full border-t border-white/5 pt-4">
-                <p className="text-supporting text-xs font-button tracking-widest mb-2 uppercase">Nomor Anggota</p>
+                <p className="text-supporting text-xs font-button tracking-widest mb-2 uppercase">{t('Nomor Anggota')}</p>
                 <p className="text-white font-mono tracking-widest bg-primary py-2 rounded-sm border border-white/10">TS-{user.members?.[0]?.generation_number || '--'}-042</p>
               </div>
             </div>
 
             <nav className="flex flex-col space-y-2">
-              <SidebarItem icon={<User />} label="Profil Saya" active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
-              <SidebarItem icon={<QrCode />} label="Kartu Digital" active={activeTab === 'card'} onClick={() => setActiveTab('card')} />
-              <SidebarItem icon={<BookOpen />} label="Arsip Naskah" active={activeTab === 'scripts'} onClick={() => setActiveTab('scripts')} />
-              <SidebarItem icon={<Calendar />} label="Agenda Kegiatan" active={activeTab === 'events'} onClick={() => setActiveTab('events')} />
-              <SidebarItem icon={<MessageSquare />} label="Forum Diskusi" active={activeTab === 'forum'} onClick={() => setActiveTab('forum')} />
+              <SidebarItem icon={<User />} label={t('Profil Saya')} active={activeTab === 'profile'} onClick={() => setActiveTab('profile')} />
+              <SidebarItem icon={<QrCode />} label={t('Kartu Digital')} active={activeTab === 'card'} onClick={() => setActiveTab('card')} />
+              <SidebarItem icon={<BookOpen />} label={t('Arsip Naskah')} active={activeTab === 'scripts'} onClick={() => setActiveTab('scripts')} />
+              <SidebarItem icon={<Calendar />} label={t('Agenda Kegiatan')} active={activeTab === 'events'} onClick={() => setActiveTab('events')} />
+              <SidebarItem icon={<MessageSquare />} label={t('Forum Diskusi')} active={activeTab === 'forum'} onClick={() => setActiveTab('forum')} />
               
               {user.role === 'admin' && (
                 <button
@@ -184,29 +186,28 @@ export default function Dashboard() {
                   className="flex items-center space-x-3 px-4 py-3 text-sm font-button tracking-widest transition-colors w-full text-left rounded-sm text-accent-primary bg-accent-primary/10 hover:bg-accent-primary/20 border border-accent-primary/20 mt-4"
                 >
                   <Shield className="w-5 h-5" />
-                  <span>HALAMAN ADMIN</span>
+                  <span>{t('HALAMAN ADMIN')}</span>
                 </button>
               )}
 
               <button onClick={handleLogout} className="flex items-center space-x-3 px-4 py-3 text-sm font-button tracking-widest transition-colors text-red-400 hover:bg-red-500/10 hover:text-red-400 rounded-sm mt-4 border border-red-500/20">
-                <LogOut className="w-4 h-4" /> <span>KELUAR</span>
+                <LogOut className="w-4 h-4" /> <span>{t('KELUAR')}</span>
               </button>
             </nav>
           </div>
 
-          {/* Main Content */}
           <div className="w-full lg:w-3/4">
             <div className="bg-secondary border border-white/5 p-8 min-h-[600px] rounded-sm">
               {activeTab === 'profile' && (
                 <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   <div className="flex justify-between items-center mb-6 border-b border-white/10 pb-4">
-                    <h2 className="text-2xl font-heading font-bold text-white">Profil Saya</h2>
+                    <h2 className="text-2xl font-heading font-bold text-white">{t('Profil Saya')}</h2>
                     {!isEditing && (
                       <button 
                         onClick={() => setIsEditing(true)}
-                        className="px-6 py-2 bg-primary border border-white/20 text-white font-button text-xs tracking-widest hover:border-white transition-colors"
+                        className="px-6 py-2 bg-primary border border-white/20 text-white font-button text-xs tracking-widest hover:border-white transition-colors flex items-center gap-2"
                       >
-                        EDIT PROFIL
+                        <Edit2 className="w-3 h-3" /> {t('EDIT PROFIL')}
                       </button>
                     )}
                   </div>
@@ -215,33 +216,33 @@ export default function Dashboard() {
                     <div className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <div>
-                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">Nama Lengkap</label>
+                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">{t('Nama Lengkap')}</label>
                           <input type="text" value={formData.full_name} onChange={e => setFormData({...formData, full_name: e.target.value})} className="w-full bg-primary border border-white/10 text-white px-4 py-2 font-body" />
                         </div>
                         <div>
-                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">Nama Panggilan</label>
+                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">{t('Nama Panggilan')}</label>
                           <input type="text" value={formData.nickname} onChange={e => setFormData({...formData, nickname: e.target.value})} className="w-full bg-primary border border-white/10 text-white px-4 py-2 font-body" />
                         </div>
                         <div>
-                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">Email (Tidak bisa diubah)</label>
+                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">{t('Email (Tidak bisa diubah)')}</label>
                           <input type="text" value={user.email} disabled className="w-full bg-primary/50 border border-white/5 text-white/50 px-4 py-2 font-body cursor-not-allowed" />
                         </div>
                         <div>
-                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">No. Telepon</label>
+                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">{t('No. Telepon')}</label>
                           <input type="text" value={formData.phone_number} onChange={e => setFormData({...formData, phone_number: e.target.value})} className="w-full bg-primary border border-white/10 text-white px-4 py-2 font-body" />
                         </div>
                         <div>
-                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">Angkatan (Angka)</label>
+                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">{t('Angkatan (Angka)')}</label>
                           <input type="number" value={formData.generation_number} onChange={e => setFormData({...formData, generation_number: e.target.value})} className="w-full bg-primary border border-white/10 text-white px-4 py-2 font-body" />
                         </div>
                         <div>
-                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">Tahun Bergabung</label>
+                          <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">{t('Tahun Bergabung')}</label>
                           <input type="number" value={formData.join_year} onChange={e => setFormData({...formData, join_year: e.target.value})} className="w-full bg-primary border border-white/10 text-white px-4 py-2 font-body" />
                         </div>
                       </div>
 
                       <div>
-                        <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">Keahlian & Minat</label>
+                        <label className="text-xs text-supporting font-button tracking-widest uppercase mb-2 block">{t('Keahlian & Minat')}</label>
                         <div className="flex flex-wrap gap-2">
                           {availableSkills.map(skill => (
                             <button
@@ -266,12 +267,11 @@ export default function Dashboard() {
                           disabled={isSaving}
                           className="px-6 py-2 bg-accent-primary text-white font-button text-xs tracking-widest hover:bg-accent-secondary transition-colors"
                         >
-                          {isSaving ? 'MENYIMPAN...' : 'SIMPAN PERUBAHAN'}
+                          {isSaving ? t('MENYIMPAN...') : t('SIMPAN PERUBAHAN')}
                         </button>
                         <button 
                           onClick={() => {
                             setIsEditing(false);
-                            // Reset form
                             setFormData({
                               full_name: user.full_name || '',
                               nickname: user.nickname || '',
@@ -284,28 +284,28 @@ export default function Dashboard() {
                           disabled={isSaving}
                           className="px-6 py-2 bg-transparent border border-white/20 text-white font-button text-xs tracking-widest hover:border-white transition-colors"
                         >
-                          BATAL
+                          {t('BATAL')}
                         </button>
                       </div>
                     </div>
                   ) : (
                     <>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-                        <InfoField label="Nama Lengkap" value={user.full_name} />
-                        <InfoField label="Nama Panggilan" value={user.nickname || '-'} />
-                        <InfoField label="Email" value={user.email} />
-                        <InfoField label="No. Telepon" value={user.phone_number || '-'} />
-                        <InfoField label="Angkatan" value={user.members?.[0]?.generation_number ? `Ke-${user.members[0].generation_number}` : '-'} />
-                        <InfoField label="Tahun Bergabung" value={user.members?.[0]?.join_year || '-'} />
+                        <InfoField label={t('Nama Lengkap')} value={user.full_name} />
+                        <InfoField label={t('Nama Panggilan')} value={user.nickname || '-'} />
+                        <InfoField label={t('Email')} value={user.email} />
+                        <InfoField label={t('No. Telepon')} value={user.phone_number || '-'} />
+                        <InfoField label={t('Angkatan')} value={user.members?.[0]?.generation_number ? `${t('Ke-')}${user.members[0].generation_number}` : '-'} />
+                        <InfoField label={t('Tahun Bergabung')} value={user.members?.[0]?.join_year || '-'} />
                       </div>
-                      <h3 className="text-sm font-button tracking-widest text-supporting mb-4 uppercase">Keahlian & Minat</h3>
+                      <h3 className="text-sm font-button tracking-widest text-supporting mb-4 uppercase">{t('Keahlian & Minat')}</h3>
                       <div className="flex flex-wrap gap-2 mb-8">
                         {(user.members?.[0]?.skills || []).length > 0 ? (
                           user.members[0].skills.map(skill => (
                             <span key={skill} className="bg-primary border border-white/10 px-3 py-1 text-xs text-white rounded-sm">{skill}</span>
                           ))
                         ) : (
-                          <span className="text-supporting text-sm">Belum ada keahlian yang ditambahkan.</span>
+                          <span className="text-supporting text-sm">{t('Belum ada keahlian yang ditambahkan.')}</span>
                         )}
                       </div>
                     </>
@@ -323,10 +323,9 @@ export default function Dashboard() {
                         <img src={user.photo_url || '/images/stage_performance_1786818192677.jpg'} alt="Profile" className="w-full h-full object-cover" />
                       </div>
                       <h3 className="text-xl font-heading font-bold text-white mt-4">{user.full_name}</h3>
-                      <p className="text-accent-primary text-sm font-button">{user.members?.[0]?.member_status || 'Anggota Aktif'}</p>
+                      <p className="text-accent-primary text-sm font-button">{t(user.members?.[0]?.member_status || 'Anggota Aktif')}</p>
                       
                       <div className="mt-8 bg-white p-2 rounded-md">
-                        {/* Fake QR Code */}
                         <div className="w-32 h-32 bg-secondary flex items-center justify-center text-supporting text-xs text-center border-4 border-white relative">
                           <QrCode className="w-20 h-20 text-white absolute" />
                         </div>
@@ -338,10 +337,14 @@ export default function Dashboard() {
               )}
 
               {['scripts', 'events', 'forum'].includes(activeTab) && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full text-center pt-20">
-                  <FileText className="w-16 h-16 text-white/20 mb-4" />
-                  <h2 className="text-2xl font-heading text-white mb-2">Fitur Segera Hadir</h2>
-                  <p className="text-supporting max-w-md">Modul ini sedang dalam tahap pengembangan dan akan segera tersedia untuk Anda.</p>
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center h-full min-h-[400px] text-center px-4">
+                  <div className="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-6">
+                    <BookOpen className="w-10 h-10 text-white/20" />
+                  </div>
+                  <h2 className="text-2xl font-heading text-white mb-2">{t('Fitur Segera Hadir')}</h2>
+                  <p className="text-supporting font-body max-w-md">
+                    {t('Kami sedang mengembangkan fitur ini untuk meningkatkan pengalaman Anda di Senapati HUB.')}
+                  </p>
                 </motion.div>
               )}
             </div>

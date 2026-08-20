@@ -3,8 +3,10 @@ import { motion } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { Link, useNavigate } from 'react-router-dom';
 import { LogIn, Eye, EyeOff } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 
 export default function Login() {
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -32,7 +34,7 @@ export default function Login() {
       navigate('/dashboard');
     } catch (err) {
       console.error('Login error:', err.message);
-      setError('Gagal login: Email atau password salah.');
+      setError(err.message || t('Email atau password salah.'));
     } finally {
       setIsLoading(false);
     }
@@ -48,9 +50,9 @@ export default function Login() {
         {/* Background Accent */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-accent-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
         
-        <div className="text-center mb-8 relative z-10">
-          <h1 className="text-3xl font-heading-alt font-bold text-white mb-2">Login</h1>
-          <p className="text-supporting font-body text-sm">Masuk ke akun Teater Senapati Anda</p>
+        <div className="mb-8 text-center relative z-10">
+          <h1 className="text-3xl md:text-4xl font-heading-alt font-bold text-white mb-2">{t('Selamat Datang')}</h1>
+          <p className="text-supporting font-body text-sm">{t('Silakan masuk ke akun Senapati HUB Anda')}</p>
         </div>
 
         {error && (
@@ -103,16 +105,16 @@ export default function Login() {
             ) : (
               <>
                 <LogIn className="w-5 h-5" />
-                <span>Masuk</span>
+                <span>{t('Masuk')}</span>
               </>
             )}
           </button>
         </form>
 
         <div className="mt-8 text-center relative z-10 border-t border-white/10 pt-6">
-          <p className="text-supporting font-body text-sm mb-2">Belum punya akun?</p>
+          <p className="text-supporting font-body text-sm mb-2">{t('Belum punya akun?')}</p>
           <Link to="/register" className="text-accent-primary font-button text-sm tracking-widest hover:text-white transition-colors">
-            DAFTAR SEKARANG
+            {t('DAFTAR SEKARANG')}
           </Link>
         </div>
       </motion.div>

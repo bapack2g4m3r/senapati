@@ -20,11 +20,13 @@ import Donasi from './pages/Donasi';
 import DigitalWall from './pages/DigitalWall';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 function App() {
   return (
-    <div className="min-h-screen flex flex-col bg-primary font-body text-neutral selection:bg-accent-primary selection:text-white">
-      <Navbar />
+    <LanguageProvider>
+      <div className="min-h-screen flex flex-col bg-primary font-body text-neutral selection:bg-accent-primary selection:text-white">
+        <Navbar />
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home />} />
@@ -50,6 +52,7 @@ function App() {
         </Routes>
       </main>
     </div>
+    </LanguageProvider>
   );
 }
 

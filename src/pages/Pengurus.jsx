@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const structure = [
   {
@@ -29,6 +30,7 @@ const structure = [
 ];
 
 export default function Pengurus() {
+  const { t } = useLanguage();
   return (
     <div className="pt-24 min-h-screen bg-primary pb-20">
 
@@ -39,7 +41,7 @@ export default function Pengurus() {
           animate={{ opacity: 1, y: 0 }}
           className="text-4xl md:text-5xl font-heading-alt font-bold text-white mb-4"
         >
-          Struktur Organisasi
+          {t('Struktur Organisasi')}
         </motion.h1>
         <motion.p
           initial={{ opacity: 0 }}
@@ -47,7 +49,7 @@ export default function Pengurus() {
           transition={{ delay: 0.2 }}
           className="text-supporting font-body max-w-2xl mx-auto text-lg"
         >
-          Mengenal lebih dekat para penggerak di balik layar Teater Senapati periode kepengurusan saat ini.
+          {t('Mengenal lebih dekat para penggerak di balik layar Teater Senapati periode kepengurusan saat ini.')}
         </motion.p>
       </div>
 
@@ -55,7 +57,7 @@ export default function Pengurus() {
         {structure.map((section, idx) => (
           <div key={idx} className="mb-20 last:mb-0">
             <h2 className="text-2xl font-heading font-bold text-accent-primary mb-8 border-b border-white/10 pb-4 flex items-center justify-center md:justify-start">
-              {section.category}
+              {t(section.category)}
             </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
               {section.members.map((member, mIdx) => (
@@ -77,7 +79,7 @@ export default function Pengurus() {
                   </div>
                   <div className="p-6 text-center">
                     <h3 className="text-lg font-heading font-bold text-white mb-1">{member.name}</h3>
-                    <p className="text-xs font-button tracking-widest text-accent-primary uppercase">{member.role}</p>
+                    <p className="text-xs font-button tracking-widest text-accent-primary uppercase">{t(member.role)}</p>
                   </div>
                 </motion.div>
               ))}
