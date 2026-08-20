@@ -1,115 +1,198 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ComposableMap, Geographies, Geography, Marker, ZoomableGroup } from 'react-simple-maps';
+import { Tooltip } from 'react-tooltip';
 import { motion } from 'framer-motion';
-import { MapPin, Users, Globe, Building2 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { MapPin, Users, Globe } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import { useLanguage } from '../contexts/LanguageContext';
+import { cityCoordinates } from '../data/cityCoordinates';
 
-// Mock Data for Alumni Distribution
-const distributionData = [
-  { city: 'Bandung', province: 'Jawa Barat', country: 'Indonesia', count: 320, percentage: 60 },
-  { city: 'Jakarta', province: 'DKI Jakarta', country: 'Indonesia', count: 125, percentage: 25 },
-  { city: 'Surabaya', province: 'Jawa Timur', country: 'Indonesia', count: 30, percentage: 5 },
-  { city: 'Yogyakarta', province: 'DI Yogyakarta', country: 'Indonesia', count: 20, percentage: 4 },
-  { city: 'Lainnya', province: '-', country: 'Global', count: 25, percentage: 6 },
-];
-
-const totalAlumni = distributionData.reduce((acc, curr) => acc + curr.count, 0);
+const geoUrl = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
 export default function AlumniMap() {
-  const [activeTab, setActiveTab] = useState('kota');
+  const { t } = useLanguage();
+  const [mapData, setMapData] = useState([]);
+  const [stats, setStats] = useState({ total: 0, countries: 0 });
+  const [content, setContent] = useState("");
+  const [currentZoom, setCurrentZoom] = useState(1);
+
+  useEffect(() => {
+    // Dummy Data for Preview (focused on Java/Indonesia)
+    const dummyData = [
+      { city: 'Bandung', count: 125 },
+      { city: 'Jakarta', count: 85 },
+      { city: 'Surabaya', count: 32 },
+      { city: 'Yogyakarta', count: 45 },
+      { city: 'Semarang', count: 18 },
+      { city: 'Malang', count: 12 },
+      { city: 'Solo', count: 8 },
+      { city: 'Bogor', count: 15 },
+      { city: 'Depok', count: 10 },
+      { city: 'Tangerang', count: 22 },
+      { city: 'Bekasi', count: 20 },
+      { city: 'Denpasar', count: 5 },
+      { city: 'Makassar', count: 3 },
+      { city: 'Tokyo', count: 2 },
+      { city: 'London', count: 1 },
+      { city: 'Paris', count: 4 },
+      { city: 'Rome', count: 3 },
+      { city: 'New York', count: 5 },
+      { city: 'Los Angeles', count: 2 }
+    ];
+
+    const mapMarkers = [];
+    let totalAlumni = 0;
+
+    dummyData.forEach(item => {
+      totalAlumni += item.count;
+      const matchedCityKey = Object.keys(cityCoordinates).find(
+        k => item.city.toLowerCase().includes(k.toLowerCase()) || k.toLowerCase().includes(item.city.toLowerCase())
+      );
+      
+      if (matchedCityKey) {
+        mapMarkers.push({
+          name: matchedCityKey,
+          originalName: item.city,
+          coordinates: cityCoordinates[matchedCityKey],
+          count: item.count
+        });
+      }
+    });
+
+    setMapData(mapMarkers);
+    setStats({
+      total: totalAlumni,
+      countries: 3 // Indonesia, Japan, UK
+    });
+  }, []);
 
   return (
-    <div className="pt-24 min-h-screen bg-primary pb-20">
-      <div className="container mx-auto px-6 lg:px-12">
+    <div className="min-h-screen bg-[#0A0A0A] overflow-hidden flex flex-col pt-24 relative">
+      
+      {/* Map Container */}
+      <div className="absolute inset-0 z-0">
+        <ComposableMap
+          projectionConfig={{
+            scale: 250,
+            center: [70, 10] // Center between Europe/Africa and Asia to show West and East
+          }}
+          className="w-full h-full opacity-80"
+        >
+          <ZoomableGroup 
+            zoom={1} 
+            maxZoom={4} 
+            onMoveEnd={({ zoom }) => setCurrentZoom(zoom)}
+          >
+            <Geographies geography={geoUrl}>
+              {({ geographies }) =>
+                geographies.map((geo) => (
+                  <Geography
+                    key={geo.rsmKey}
+                    geography={geo}
+                    fill="#1A1A1A"
+                    stroke="#333333"
+                    strokeWidth={0.5}
+                    style={{
+                      default: { outline: "none" },
+                      hover: { fill: "#222222", outline: "none" },
+                      pressed: { fill: "#1A1A1A", outline: "none" },
+                    }}
+                  />
+                ))
+              }
+            </Geographies>
+
+            {mapData.map((marker, index) => {
+              // Calculate size based on count (min 3, max 15)
+              const size = Math.min(Math.max(marker.count * 2, 4), 15);
+              return (
+                <Marker 
+                  key={index} 
+                  coordinates={marker.coordinates}
+                  onMouseEnter={() => {
+                    setContent(`${marker.name} — ${marker.count} ${t('Alumni')}`);
+                  }}
+                  onMouseLeave={() => {
+                    setContent("");
+                  }}
+                  data-tooltip-id="map-tooltip"
+                  data-tooltip-content={`${marker.name} — ${marker.count} ${t('Alumni')}`}
+                >
+                  <g className="cursor-pointer">
+                    <circle
+                      r={(size + 4) / currentZoom}
+                      fill="#C81D25"
+                      opacity={0.3}
+                      className="animate-pulse"
+                    />
+                    <circle
+                      r={size / currentZoom}
+                      fill="#E63946"
+                      stroke="#0A0A0A"
+                      strokeWidth={1 / currentZoom}
+                      style={{ filter: "drop-shadow(0px 0px 4px rgba(230, 57, 70, 0.8))" }}
+                    />
+                  </g>
+                </Marker>
+              );
+            })}
+          </ZoomableGroup>
+        </ComposableMap>
         
-        {/* Header */}
-        <div className="text-center mb-16">
-          <motion.h1 
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-heading-alt font-bold text-white mb-4"
-          >
-            Peta Persebaran Alumni
-          </motion.h1>
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-            className="text-supporting font-body max-w-2xl mx-auto text-lg"
-          >
-            Keluarga besar Teater Senapati telah tersebar ke berbagai penjuru. Jarak bukan halangan, panggung kita kini adalah dunia.
-          </motion.p>
-        </div>
-
-        {/* Stats Highlight */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="bg-secondary border border-white/10 p-6 flex flex-col items-center text-center rounded-sm">
-            <Users className="w-8 h-8 text-accent-primary mb-4" />
-            <h3 className="text-4xl font-heading font-bold text-white mb-2">{totalAlumni}</h3>
-            <p className="text-sm font-button tracking-widest text-supporting uppercase">Total Alumni Terdata</p>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="bg-secondary border border-white/10 p-6 flex flex-col items-center text-center rounded-sm">
-            <Building2 className="w-8 h-8 text-accent-primary mb-4" />
-            <h3 className="text-4xl font-heading font-bold text-white mb-2">24+</h3>
-            <p className="text-sm font-button tracking-widest text-supporting uppercase">Kota di Indonesia</p>
-          </motion.div>
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="bg-secondary border border-white/10 p-6 flex flex-col items-center text-center rounded-sm">
-            <Globe className="w-8 h-8 text-accent-primary mb-4" />
-            <h3 className="text-4xl font-heading font-bold text-white mb-2">5</h3>
-            <p className="text-sm font-button tracking-widest text-supporting uppercase">Negara Berbeda</p>
-          </motion.div>
-        </div>
-
-        {/* Visual Map Area (Placeholder for real Map integration later) */}
-        <div className="relative w-full aspect-[21/9] bg-secondary border border-white/10 rounded-sm mb-16 overflow-hidden flex items-center justify-center group">
-          {/* Abstract Map Dots Visual */}
-          <div className="absolute inset-0 opacity-20 pointer-events-none" style={{ backgroundImage: 'radial-gradient(#ffffff 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-          <div className="absolute inset-0 bg-gradient-to-t from-primary via-transparent to-transparent z-0" />
-          
-          <MapPin className="w-24 h-24 text-white/5 absolute group-hover:scale-110 transition-transform duration-700" />
-          
-          <div className="relative z-10 text-center p-6 bg-primary/80 backdrop-blur-md border border-white/10 rounded-sm">
-            <h2 className="text-xl font-heading-alt font-bold text-accent-primary mb-2">Integrasi Peta Global</h2>
-            <p className="text-supporting text-sm max-w-sm">
-              Infrastruktur database siap untuk integrasi Mapbox/Google Maps di masa mendatang.
-            </p>
-          </div>
-        </div>
-
-        {/* Detailed Data List */}
-        <div>
-          <div className="flex space-x-4 mb-8 border-b border-white/10 pb-4">
-            <button onClick={() => setActiveTab('kota')} className={cn("text-sm font-button tracking-widest pb-4 -mb-4 transition-colors", activeTab === 'kota' ? "text-accent-primary border-b-2 border-accent-primary font-bold" : "text-supporting hover:text-white")}>BERDASARKAN KOTA</button>
-            <button onClick={() => setActiveTab('provinsi')} className={cn("text-sm font-button tracking-widest pb-4 -mb-4 transition-colors", activeTab === 'provinsi' ? "text-accent-primary border-b-2 border-accent-primary font-bold" : "text-supporting hover:text-white")}>BERDASARKAN PROVINSI</button>
-            <button onClick={() => setActiveTab('negara')} className={cn("text-sm font-button tracking-widest pb-4 -mb-4 transition-colors", activeTab === 'negara' ? "text-accent-primary border-b-2 border-accent-primary font-bold" : "text-supporting hover:text-white")}>BERDASARKAN NEGARA</button>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {distributionData.map((item, idx) => (
-              <motion.div 
-                key={idx}
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                className="bg-secondary border border-white/5 p-6 hover:border-accent-primary/50 transition-colors rounded-sm flex justify-between items-center"
-              >
-                <div>
-                  <h4 className="text-xl font-heading font-bold text-white mb-1">
-                    {activeTab === 'kota' ? item.city : activeTab === 'provinsi' ? item.province : item.country}
-                  </h4>
-                  <p className="text-xs font-button text-supporting uppercase tracking-widest">
-                    {activeTab === 'kota' ? `${item.province}, ${item.country}` : activeTab === 'provinsi' ? item.country : ''}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <span className="text-2xl font-heading font-bold text-accent-primary block">{item.count}</span>
-                  <span className="text-[10px] font-mono text-supporting">{item.percentage}%</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
+        <Tooltip 
+          id="map-tooltip" 
+          className="bg-[#1A1A1A]/90 backdrop-blur-md border border-white/10 text-white font-button text-xs tracking-widest z-50 rounded-sm px-3 py-2" 
+        />
       </div>
+
+      {/* Sidebar UI */}
+      <div className="absolute bottom-0 left-0 right-0 md:top-24 md:bottom-auto md:left-6 md:right-auto z-10 w-full md:w-80 p-4 md:p-0 flex flex-col pointer-events-none">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-[#0A0A0A]/90 backdrop-blur-xl border border-white/10 rounded-2xl md:rounded-lg p-5 md:p-6 pointer-events-auto max-h-[45vh] md:max-h-none overflow-y-auto shadow-2xl"
+          style={{ scrollbarWidth: 'none' }}
+        >
+          <div className="flex items-center space-x-3 mb-4 md:mb-6 border-b border-white/10 pb-4">
+            <Globe className="w-5 h-5 md:w-6 md:h-6 text-accent-secondary" />
+            <div>
+              <h1 className="text-white font-heading font-bold text-lg md:text-xl leading-tight">SENAPATI GLOBAL</h1>
+              <p className="text-[10px] text-supporting font-button tracking-widest uppercase">{t('Jejak Alumni')}</p>
+            </div>
+          </div>
+
+          <div className="flex flex-row md:flex-col justify-between md:justify-start gap-4 md:gap-6 mb-6">
+            <div>
+              <p className="text-[10px] text-supporting font-button tracking-widest uppercase mb-1">{t('Total Alumni Terdata')}</p>
+              <p className="text-3xl md:text-4xl font-heading font-bold text-white" style={{ textShadow: '0 0 10px rgba(230,57,70,0.5)' }}>
+                {stats.total}+
+              </p>
+            </div>
+            <div className="text-right md:text-left">
+              <p className="text-[10px] text-supporting font-button tracking-widest uppercase mb-1">{t('Kota/Negara')}</p>
+              <p className="text-xl md:text-2xl font-heading font-bold text-white" style={{ textShadow: '0 0 10px rgba(230,57,70,0.5)' }}>
+                {stats.countries}+
+              </p>
+            </div>
+          </div>
+
+          <div className="border-t border-white/10 pt-4 md:pt-6">
+            <p className="text-[10px] text-supporting font-button tracking-widest uppercase mb-3 md:mb-4">{t('Sebaran Terbesar')}</p>
+            <div className="space-y-3 max-h-32 md:max-h-40 overflow-y-auto pr-2" style={{ scrollbarWidth: 'thin', scrollbarColor: 'rgba(255,255,255,0.1) transparent' }}>
+              {mapData.sort((a, b) => b.count - a.count).slice(0, 5).map((m, i) => (
+                <div key={i} className="flex justify-between items-center text-sm">
+                  <div className="flex items-center space-x-2">
+                    <MapPin className="w-3 h-3 text-accent-secondary" />
+                    <span className="text-white font-body">{m.name}</span>
+                  </div>
+                  <span className="text-accent-secondary font-mono text-xs">{m.count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </motion.div>
+      </div>
+
     </div>
   );
 }
